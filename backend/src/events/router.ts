@@ -2,6 +2,7 @@ import { Router } from "express";
 import { Prisma } from "@prisma/client";
 import { prisma } from "../db";
 import { EventSchema } from "./schema";
+import { applyEventScore } from "../scoring/engine";
 
 export const eventsRouter = Router();
 
@@ -17,18 +18,37 @@ eventsRouter.post("/", async (req, res) => {
 
   const e = parsed.data;
 
-  await prisma.accountEvent.create({
-    data: {
-      eventId: e.eventId,
-      accountId: e.accountId,
-      sessionId: e.sessionId,
-      eventType: e.eventType,
-      severity: e.severity,
-      source: e.source,
-      occurredAt: new Date(e.occurredAt),
-      payload: e.payload as Prisma.InputJsonValue
-    }
-  });
+  try {
+    await prisma.$transaction(async (tx) => {
+      await tx.account.upsert({
+        where: { id: e.accountId },
+        update: {},
+        create: {
+          id: e.accountId,
+          username: e.accountId
+        }
+      });
 
-  res.status(201).json({ status: "event_ingested" });
+      await tx.accountEvent.create({
+        data: {
+          eventId: e.eventId,
+          accountId: e.accountId,
+          sessionId: e.sessionId,
+          eventType: e.eventType,
+          severity: e.severity,
+          source: e.source,
+          occurredAt: new Date(e.occurredAt),
+          payload: e.payload as Prisma.InputJsonValue
+        }
+      });
+    });
+
+    // ✅ apply scoring AFTER transaction
+    await applyEventScore(e.accountId, e.eventType);
+
+    return res.status(201).json({ status: "event_ingested" });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: "Event ingestion failed" });
+  }
 });
