@@ -1,0 +1,62 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model AccountEvent {
+  eventId     String   @id @map("event_id")
+  accountId   String   @map("account_id")
+  sessionId   String?  @map("session_id")
+
+  eventType   EventType
+  severity    Severity
+  source      EventSource
+
+  payload     Json
+
+  occurredAt  DateTime @map("occurred_at")
+
+  @@index([accountId, occurredAt(sort: Desc)])
+  @@map("account_events")
+}
+
+enum EventType {
+  SESSION_STARTED
+  SESSION_ENDED
+  SESSION_ABORTED
+
+  LOGIN_SUCCESS
+  LOGIN_CHALLENGE
+  LOGIN_FAILED
+  LOGOUT
+
+  ACTION_ATTEMPTED
+  ACTION_SUCCESS
+  ACTION_FAILED
+  ACTION_BLOCKED
+
+  WARNING_RECEIVED
+  TEMP_RESTRICTION
+  SHADOWBAN_SUSPECTED
+
+  ACCOUNT_PAUSED
+  ACCOUNT_RESUMED
+  ACCOUNT_FROZEN
+  MANUAL_OVERRIDE
+}
+
+enum Severity {
+  info
+  warning
+  danger
+}
+
+enum EventSource {
+  automation_worker
+  manual
+  system
+}
