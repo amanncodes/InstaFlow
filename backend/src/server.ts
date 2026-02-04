@@ -1,12 +1,14 @@
 import express from "express";
 import { eventsRouter } from "./events/router";
 import { accountsRouter } from "./accounts/router";
+import { automationRouter } from "./automation/router";
 
 console.log("Starting InstaFlow API server...");
 
 const app = express();
 app.use(express.json());
 app.use("/api/accounts", accountsRouter);
+app.use("/api/automation", automationRouter);
 
 app.get("/health", (_req, res) => {
   res.json({ status: "ok", service: "instaflow-api" });
