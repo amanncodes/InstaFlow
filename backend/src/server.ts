@@ -3,6 +3,7 @@ import { eventsRouter } from "./events/router";
 import { accountsRouter } from "./accounts/router";
 import { automationRouter } from "./automation/router";
 import { runCooldownJobs } from "./cooldown/job";
+import { adminRouter } from "./admin/router";
 
 // DEV: run every minute 
 setInterval(() => {
@@ -16,6 +17,7 @@ const app = express();
 app.use(express.json());
 app.use("/api/accounts", accountsRouter);
 app.use("/api/automation", automationRouter);
+app.use("/api/admin", adminRouter);
 
 app.get("/health", (_req, res) => {
   res.json({ status: "ok", service: "instaflow-api" });
