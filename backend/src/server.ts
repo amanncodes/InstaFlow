@@ -2,6 +2,13 @@ import express from "express";
 import { eventsRouter } from "./events/router";
 import { accountsRouter } from "./accounts/router";
 import { automationRouter } from "./automation/router";
+import { runCooldownJobs } from "./cooldown/job";
+
+// DEV: run every minute 
+setInterval(() => {
+  runCooldownJobs().catch(console.error);
+}, 60 + 1000);
+
 
 console.log("Starting InstaFlow API server...");
 

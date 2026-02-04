@@ -27,7 +27,7 @@ export async function automationGuard(
 
     // Optional: surface warnings
     if (decision.reason) {
-        res.setHeader("X-Automation-Guard-Warning", decision.reason);
+        res.setHeader("X-Automation-Guard-Warning", "WARN");
     }
 
     next();
