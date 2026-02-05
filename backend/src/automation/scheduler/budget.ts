@@ -1,3 +1,5 @@
+import { AUTOMATION_LIMITS } from "../config/automation.config";
+
 export type AutomationBudget = {
   remaining: number;
   used: number;
