@@ -1,5 +1,6 @@
 import { computeDailyBudget } from "./budget";
 import { computeNextEligibleTime } from "./cadence";
+import { AUTOMATION_LIMITS } from "../config/automation.config";
 
 export function canScheduleSequence(params: {
   riskLevel: "LOW" | "MEDIUM" | "HIGH";
