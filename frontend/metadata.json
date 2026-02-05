@@ -1,0 +1,5 @@
+{
+  "name": "InstaFlow Control Plane",
+  "description": "A high-integrity operator dashboard for Instagram automation infrastructure, focusing on risk monitoring, account health (Trust Score), and manual intervention safety.",
+  "requestFramePermissions": []
+}
