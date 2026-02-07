@@ -68,6 +68,7 @@ export interface PerformanceStats {
 export interface Account {
   accountId: string;
   username: string;
+  displayId?: string;
   state: AccountState;
   trustScore: number;
   riskLevel: RiskLevel;
