@@ -123,3 +123,16 @@ docker-compose.override.yml
 
 *.exe 
 *.pyc
+
+########################################
+# Automation Engine (local artifacts)
+########################################
+
+automation-engine/**/__pycache__/
+automation-engine/**/.venv/
+automation-engine/**/.git/
+automation-engine/**/dump.rdb
+automation-engine/**/.env
+automation-engine/**/.env.*
+automation-engine/backend/public/avatars/*.jpg
+automation-engine/utility/*.html
