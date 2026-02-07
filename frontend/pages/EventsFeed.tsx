@@ -39,10 +39,13 @@ const EventsFeed: React.FC = () => {
 
   const filteredEvents = useMemo(() => {
     return events.filter(event => {
+      const desc = (event.description || "").toLowerCase();
+      const account = (event.accountId || "").toLowerCase();
+      const type = (event.type || "").toLowerCase();
       const matchesSearch = 
-        event.description.toLowerCase().includes(searchTerm.toLowerCase()) || 
-        event.accountId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        event.type.toLowerCase().includes(searchTerm.toLowerCase());
+        desc.includes(searchTerm.toLowerCase()) || 
+        account.includes(searchTerm.toLowerCase()) ||
+        type.includes(searchTerm.toLowerCase());
       
       const matchesSeverity = severityFilter === 'ALL' || event.severity === severityFilter;
       const matchesType = typeFilter === 'ALL' || event.type === typeFilter;
@@ -107,14 +110,14 @@ const EventsFeed: React.FC = () => {
             <div className="p-1.5 bg-blue-500/10 rounded-lg text-blue-500"><Activity size={16} /></div>
             <div>
               <p className="text-[9px] font-black text-zinc-500 uppercase tracking-widest">Fleet Health Index</p>
-              <p className="text-sm font-black mono text-emerald-400">{latestMetric.avgTrust}%</p>
+              <p className="text-sm font-black mono text-emerald-400">{latestMetric ? `${latestMetric.avgTrust}%` : "—"}</p>
             </div>
           </div>
           <div className="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2 flex items-center gap-3 shadow-lg">
             <div className="p-1.5 bg-amber-500/10 rounded-lg text-amber-500"><Zap size={16} /></div>
             <div>
               <p className="text-[9px] font-black text-zinc-500 uppercase tracking-widest">Total Action Flux</p>
-              <p className="text-sm font-black mono text-zinc-100">{latestMetric.totalActions.toLocaleString()}/h</p>
+              <p className="text-sm font-black mono text-zinc-100">{latestMetric ? `${latestMetric.totalActions.toLocaleString()}/h` : "—"}</p>
             </div>
           </div>
         </div>
@@ -136,7 +139,13 @@ const EventsFeed: React.FC = () => {
           </div>
         </div>
         <div className="relative z-10 h-[200px]">
-          <FleetHealthTrajectory data={fleetMetrics} />
+          {fleetMetrics.length > 0 ? (
+            <FleetHealthTrajectory data={fleetMetrics} />
+          ) : (
+            <div className="h-full flex items-center justify-center text-zinc-600 text-xs font-bold uppercase tracking-widest">
+              No fleet telemetry yet
+            </div>
+          )}
         </div>
       </section>
 
