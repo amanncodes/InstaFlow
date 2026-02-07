@@ -1,4 +1,4 @@
-// src/automation/contracts/enums.ts
+// src/automation/contracts/actionTypes.ts
 
 export enum ActionType {
   WAIT = "WAIT",

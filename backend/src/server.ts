@@ -2,18 +2,21 @@ import express from "express";
 import { eventsRouter } from "./events/router";
 import { accountsRouter } from "./accounts/router";
 import { automationRouter } from "./automation/router";
-import { runCooldownJobs } from "./cooldown/job";
 import { adminRouter } from "./admin/router";
-
-// DEV: run every minute 
-setInterval(() => {
-  runCooldownJobs().catch(console.error);
-}, 60 + 1000);
-
+import cors from "cors";
+import path from "path";
 
 console.log("Starting InstaFlow API server...");
 
 const app = express();
+
+app.use(cors({
+  origin: ["http://localhost:5173", "http://127.0.0.1:5173"],
+}));
+
+// Serve avatars and other static assets
+app.use("/static", express.static(path.join(__dirname, "..", "public")));
+
 app.use(express.json());
 app.use("/api/accounts", accountsRouter);
 app.use("/api/automation", automationRouter);
