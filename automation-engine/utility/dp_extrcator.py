@@ -109,11 +109,17 @@ def fetch_profile_pic(username: str, cookie_header: str) -> bytes:
 
 
 def main():
-    account = (
-        SocialAccount.objects.filter(platform="IG", logged_in=True)
-        .order_by("-last_login")
-        .first()
-    )
+    username = None
+    if len(sys.argv) > 1:
+        for i, arg in enumerate(sys.argv):
+            if arg in ("--username", "-u") and i + 1 < len(sys.argv):
+                username = sys.argv[i + 1]
+
+    account_qs = SocialAccount.objects.filter(platform="IG", logged_in=True)
+    if username:
+        account_qs = account_qs.filter(username=username)
+
+    account = account_qs.order_by("-last_login").first()
     if not account:
         print("No logged-in Instagram account found. Please launch login via admin.")
         return
