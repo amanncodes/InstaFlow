@@ -181,7 +181,9 @@ const AccountDetail: React.FC<AccountDetailProps> = ({ accountId, onBack }) => {
                 'from-emerald-600 to-emerald-400'
               }`}>
                 <div className="bg-zinc-900 p-1 rounded-full">
-                  <img src={data.avatarUrl} alt={data.username} className="w-24 h-24 rounded-full border-2 border-zinc-900 shadow-inner" />
+                  {data.avatarUrl ? (
+                    <img src={`${data.avatarUrl}${data.avatarUrl.includes('?') ? '&' : '?'}t=${Date.now()}`} alt={data.username} className="w-24 h-24 rounded-full border-2 border-zinc-900 shadow-inner" />
+                  ) : null}
                 </div>
               </div>
               <div>

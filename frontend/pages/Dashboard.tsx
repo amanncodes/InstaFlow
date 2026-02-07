@@ -57,6 +57,23 @@ const Dashboard: React.FC<DashboardProps> = ({ onSelectAccount }) => {
     return matchesSearch && matchesState && matchesRisk && matchesTag;
   });
 
+  const accountNumberById = useMemo(() => {
+    const map = new Map<string, string>();
+    accounts.forEach((account, index) => {
+      map.set(account.accountId, account.displayId ?? `acc_${String(index + 1).padStart(3, '0')}`);
+    });
+    return map;
+  }, [accounts]);
+
+  const [avatarNonce, setAvatarNonce] = useState<Record<string, number>>({});
+  const bumpAvatarNonce = (id: string) => {
+    setAvatarNonce((prev) => {
+      const next = (prev[id] ?? 0) + 1;
+      if (next > 3) return prev;
+      return { ...prev, [id]: next };
+    });
+  };
+
   const resetFilters = () => {
     setSearch('');
     setStateFilter('ALL');
@@ -207,11 +224,22 @@ const Dashboard: React.FC<DashboardProps> = ({ onSelectAccount }) => {
                     <td className="px-6 py-5">
                       <div className="flex items-center gap-4">
                         <div className="w-10 h-10 rounded-full overflow-hidden bg-zinc-800 border-2 border-zinc-900 shrink-0 shadow-lg group-hover:scale-105 transition-transform">
-                          <img src={account.avatarUrl} alt={account.username} className="w-full h-full object-cover" />
+                          {account.avatarUrl ? (
+                            <img
+                              src={`${account.avatarUrl}${account.avatarUrl.includes('?') ? '&' : '?'}t=${avatarNonce[account.accountId] ?? 0}`}
+                              alt={account.username}
+                              className="w-full h-full object-cover"
+                              onError={() => bumpAvatarNonce(account.accountId)}
+                            />
+                          ) : null}
                         </div>
                         <div className="min-w-0">
                           <div className="font-black text-zinc-100 group-hover:text-emerald-400 transition-colors tracking-tight truncate">@{account.username}</div>
-                          <div className="text-[9px] text-zinc-600 font-black uppercase tracking-widest truncate">{account.accountId}</div>
+                          <div className="text-[9px] text-zinc-600 font-black uppercase tracking-widest truncate">
+                            {account.accountId.startsWith("acc_")
+                              ? account.accountId
+                              : account.displayId ?? accountNumberById.get(account.accountId) ?? account.accountId}
+                          </div>
                         </div>
                       </div>
                     </td>
