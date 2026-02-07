@@ -1,0 +1,4 @@
+# One username per line. Example entries below.
+example_user_1
+example.creator
+brand_account
