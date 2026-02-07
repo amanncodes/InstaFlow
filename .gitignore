@@ -2,6 +2,10 @@
 # OS / Editor
 ########################################
 
+.venv/
+env/
+venv/
+
 # macOS
 .DS_Store
 
@@ -116,3 +120,6 @@ docker-compose.override.yml
 *.swp
 *.swo
 *.orig
+
+*.exe 
+*.pyc
