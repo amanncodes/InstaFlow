@@ -24,7 +24,9 @@ export interface AccountEvent {
   metadata?: {
     actionType?: string;
     target?: string;
+    [key: string]: unknown;
   };
+  source?: string;
 }
 
 export interface AccountNote {
@@ -70,22 +72,22 @@ export interface Account {
   trustScore: number;
   riskLevel: RiskLevel;
   lastEventAt: string;
-  automationStatus: 'Allowed' | 'Limited' | 'Blocked';
-  tags: string[];
-  avatarUrl: string;
-  fullName: string;
-  bio: string;
-  postsCount: number;
-  followersCount: number;
-  followingCount: number;
-  website: string;
+  automationStatus?: 'Allowed' | 'Limited' | 'Blocked';
+  tags?: string[];
+  avatarUrl?: string;
+  fullName?: string;
+  bio?: string;
+  postsCount?: number;
+  followersCount?: number;
+  followingCount?: number;
+  website?: string;
 }
 
 export interface AccountHealth extends Account {
   recentSignals: AccountEvent[];
-  trustHistory: MetricPoint[];
-  riskDimensions: RiskAxis[];
-  activityPulse: ActivityPoint[];
-  performance: PerformanceStats;
-  notes: AccountNote[];
+  trustHistory?: MetricPoint[];
+  riskDimensions?: RiskAxis[];
+  activityPulse?: ActivityPoint[];
+  performance?: PerformanceStats;
+  notes?: AccountNote[];
 }

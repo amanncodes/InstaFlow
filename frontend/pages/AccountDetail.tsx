@@ -92,6 +92,33 @@ const AccountDetail: React.FC<AccountDetailProps> = ({ accountId, onBack }) => {
     );
   }
 
+  const trustHistory = data.trustHistory ?? [];
+  const riskDimensions = data.riskDimensions ?? [];
+  const activityPulse = data.activityPulse ?? [];
+  const performance = data.performance;
+
+  const formatOptionalNumber = (value?: number) =>
+    value === null || value === undefined ? "—" : value.toLocaleString();
+
+  const renderMetadata = (metadata?: Record<string, unknown>) => {
+    if (!metadata) return null;
+    const entries = Object.entries(metadata).filter(([_, v]) => v !== null && v !== undefined);
+    if (entries.length === 0) return null;
+
+    return (
+      <div className="mt-2 flex flex-wrap gap-2">
+        {entries.slice(0, 6).map(([key, value]) => (
+          <span
+            key={key}
+            className="bg-zinc-950 px-2 py-0.5 rounded text-[9px] border border-zinc-800 text-zinc-500 font-mono font-bold uppercase tracking-wider"
+          >
+            {key}:{String(value)}
+          </span>
+        ))}
+      </div>
+    );
+  };
+
   const formatTimestamp = (isoString: string) => {
     const date = new Date(isoString);
     const y = date.getFullYear();
@@ -162,9 +189,9 @@ const AccountDetail: React.FC<AccountDetailProps> = ({ accountId, onBack }) => {
                 <TrustScore score={data.trustScore} size="lg" />
               </div>
               <div className="grid grid-cols-3 gap-2 w-full pt-2">
-                <div className="text-center"><p className="text-xs font-black">{data.postsCount.toLocaleString()}</p><p className="text-[8px] text-zinc-500 uppercase font-bold">Posts</p></div>
-                <div className="text-center"><p className="text-xs font-black">{data.followersCount.toLocaleString()}</p><p className="text-[8px] text-zinc-500 uppercase font-bold">Fans</p></div>
-                <div className="text-center"><p className="text-xs font-black">{data.followingCount.toLocaleString()}</p><p className="text-[8px] text-zinc-500 uppercase font-bold">Flow</p></div>
+                <div className="text-center"><p className="text-xs font-black">{formatOptionalNumber(data.postsCount)}</p><p className="text-[8px] text-zinc-500 uppercase font-bold">Posts</p></div>
+                <div className="text-center"><p className="text-xs font-black">{formatOptionalNumber(data.followersCount)}</p><p className="text-[8px] text-zinc-500 uppercase font-bold">Fans</p></div>
+                <div className="text-center"><p className="text-xs font-black">{formatOptionalNumber(data.followingCount)}</p><p className="text-[8px] text-zinc-500 uppercase font-bold">Flow</p></div>
               </div>
             </div>
           </section>
@@ -175,7 +202,13 @@ const AccountDetail: React.FC<AccountDetailProps> = ({ accountId, onBack }) => {
               <Target size={14} className="text-emerald-500" />
               <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">Telemetry Radar</p>
             </div>
-            <div className="h-[250px]"><RiskRadar data={data.riskDimensions} /></div>
+            {riskDimensions.length > 0 ? (
+              <div className="h-[250px]"><RiskRadar data={riskDimensions} /></div>
+            ) : (
+              <div className="h-[250px] flex items-center justify-center text-zinc-600 text-xs font-bold uppercase tracking-widest">
+                No telemetry data
+              </div>
+            )}
           </section>
 
           {/* Operator Notes Section */}
@@ -245,16 +278,22 @@ const AccountDetail: React.FC<AccountDetailProps> = ({ accountId, onBack }) => {
           {/* Performance Summary Strip */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-6 flex items-center gap-6">
-              <div className="shrink-0 w-20 h-20"><PerformancePie stats={data.performance} /></div>
-              <div><p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">Stability Ratio</p><p className="text-2xl font-black text-emerald-400">{data.performance.success}%</p></div>
+              {performance ? (
+                <>
+                  <div className="shrink-0 w-20 h-20"><PerformancePie stats={performance} /></div>
+                  <div><p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">Stability Ratio</p><p className="text-2xl font-black text-emerald-400">{performance.success}%</p></div>
+                </>
+              ) : (
+                <div className="text-xs font-bold uppercase tracking-widest text-zinc-600">No performance data</div>
+              )}
             </div>
             <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-6 flex items-center gap-6">
               <div className="p-3 bg-amber-500/10 rounded-2xl"><Zap size={24} className="text-amber-500" /></div>
-              <div><p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">Request Load</p><p className="text-2xl font-black text-zinc-100">{data.performance.totalActions24h.toLocaleString()}</p></div>
+              <div><p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">Request Load</p><p className="text-2xl font-black text-zinc-100">{performance ? performance.totalActions24h.toLocaleString() : "—"}</p></div>
             </div>
             <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-6 flex items-center gap-6">
               <div className="p-3 bg-blue-500/10 rounded-2xl"><Globe size={24} className="text-blue-500" /></div>
-              <div><p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">Node Uptime</p><p className="text-2xl font-black text-zinc-100">99.9%</p></div>
+              <div><p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">Node Uptime</p><p className="text-2xl font-black text-zinc-100">—</p></div>
             </div>
           </div>
 
@@ -265,14 +304,26 @@ const AccountDetail: React.FC<AccountDetailProps> = ({ accountId, onBack }) => {
                   <div className="p-3 bg-emerald-500/10 rounded-2xl"><Activity size={20} className="text-emerald-500" /></div>
                   <h3 className="text-sm font-black text-zinc-100 uppercase tracking-widest">Trust Index Volatility</h3>
                </div>
-               <div className="h-[200px]"><TrustTrajectory data={data.trustHistory} /></div>
+               {trustHistory.length > 0 ? (
+                 <div className="h-[200px]"><TrustTrajectory data={trustHistory} /></div>
+               ) : (
+                 <div className="h-[200px] flex items-center justify-center text-zinc-600 text-xs font-bold uppercase tracking-widest">
+                   No trust history
+                 </div>
+               )}
             </section>
             <section className="bg-zinc-900 border border-zinc-800 rounded-3xl p-8 shadow-xl">
               <div className="flex items-center gap-4 mb-8">
                   <div className="p-3 bg-amber-500/10 rounded-2xl"><Zap size={20} className="text-amber-500" /></div>
                   <h3 className="text-sm font-black text-zinc-100 uppercase tracking-widest">Interaction Pulse</h3>
               </div>
-              <div className="h-[200px]"><ActivityPulse data={data.activityPulse} /></div>
+              {activityPulse.length > 0 ? (
+                <div className="h-[200px]"><ActivityPulse data={activityPulse} /></div>
+              ) : (
+                <div className="h-[200px] flex items-center justify-center text-zinc-600 text-xs font-bold uppercase tracking-widest">
+                  No activity data
+                </div>
+              )}
             </section>
           </div>
 
@@ -361,6 +412,7 @@ const AccountDetail: React.FC<AccountDetailProps> = ({ accountId, onBack }) => {
                         <p className="text-[15px] text-zinc-400 group-hover:text-zinc-100 transition-colors leading-relaxed font-medium">
                           {event.description}
                         </p>
+                        {renderMetadata(event.metadata as Record<string, unknown> | undefined)}
                       </div>
                     </div>
                   ))}

@@ -24,7 +24,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
 
   const handleLoginSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (operatorId === 'OP_402' && password === 'admin') {
+    if (operatorId === import.meta.env.VITE_OPERATOR_ID && password === import.meta.env.VITE_OPERATOR_HASH) {
       onLogin(operatorId);
     } else {
       setError('Invalid operator credentials.');

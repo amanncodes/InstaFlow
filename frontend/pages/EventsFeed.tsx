@@ -59,7 +59,7 @@ const EventsFeed: React.FC = () => {
     );
   }
 
-  const latestMetric = fleetMetrics[fleetMetrics.length - 1] || { avgTrust: 0, totalActions: 0 };
+  const latestMetric = fleetMetrics[fleetMetrics.length - 1];
 
   const severityOptions = [
     { value: 'ALL', label: 'All Severities' },

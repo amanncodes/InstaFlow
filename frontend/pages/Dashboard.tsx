@@ -40,7 +40,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onSelectAccount }) => {
 
   const allTags = useMemo(() => {
     const tags = new Set<string>();
-    accounts.forEach(a => a.tags.forEach(t => tags.add(t)));
+    accounts.forEach(a => (a.tags ?? []).forEach(t => tags.add(t)));
     return Array.from(tags).sort();
   }, [accounts]);
 
@@ -48,11 +48,11 @@ const Dashboard: React.FC<DashboardProps> = ({ onSelectAccount }) => {
     const matchesSearch = 
       a.username.toLowerCase().includes(search.toLowerCase()) ||
       a.accountId.toLowerCase().includes(search.toLowerCase()) ||
-      a.tags.some(tag => tag.toLowerCase().includes(search.toLowerCase()));
+      (a.tags ?? []).some(tag => tag.toLowerCase().includes(search.toLowerCase()));
     
     const matchesState = stateFilter === 'ALL' || a.state === stateFilter;
     const matchesRisk = riskFilter === 'ALL' || a.riskLevel === riskFilter;
-    const matchesTag = selectedTag === 'ALL' || a.tags.includes(selectedTag);
+    const matchesTag = selectedTag === 'ALL' || (a.tags ?? []).includes(selectedTag);
 
     return matchesSearch && matchesState && matchesRisk && matchesTag;
   });
@@ -226,8 +226,8 @@ const Dashboard: React.FC<DashboardProps> = ({ onSelectAccount }) => {
                     </td>
                     <td className="px-6 py-5">
                       <div className="flex flex-wrap gap-2 max-w-[240px]">
-                        {account.tags.length > 0 ? (
-                          account.tags.map(tag => (
+                        {(account.tags ?? []).length > 0 ? (
+                          (account.tags ?? []).map(tag => (
                             <Tag key={tag} label={tag} />
                           ))
                         ) : (
