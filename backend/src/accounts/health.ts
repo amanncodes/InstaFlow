@@ -34,12 +34,19 @@ export async function getAccountHealth(accountId: string) {
             : "HIGH";
     
     const avatarsRoot = path.join(__dirname, "..", "..", "public", "avatars");
+    const totalAccounts = await prisma.account.count();
     const candidateNames = [account.id, account.username].filter(Boolean);
     const avatarFile = candidateNames.find((name) =>
         fs.existsSync(path.join(avatarsRoot, `${name}.jpg`))
     );
 
-    const avatarUrl = avatarFile ? `/static/avatars/${avatarFile}.jpg` : "";
+    const legacyFallback =
+        !avatarFile && totalAccounts === 1 && fs.existsSync(path.join(avatarsRoot, "acc_001.jpg"));
+    const avatarUrl = avatarFile
+        ? `/static/avatars/${avatarFile}.jpg`
+        : legacyFallback
+        ? "/static/avatars/acc_001.jpg"
+        : `/api/accounts/${account.id}/avatar`;
 
     const recentSignals = account.events.map((event) => ({
         id: event.eventId,
