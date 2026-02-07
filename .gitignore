@@ -136,3 +136,17 @@ automation-engine/**/.env
 automation-engine/**/.env.*
 automation-engine/backend/public/avatars/*.jpg
 automation-engine/utility/*.html
+automation-engine/utility/selenium_profiles/
+
+########################################
+# Chrome / Browser Profiles
+########################################
+
+**/chrome-profile/
+**/chrome-profiles/
+**/chromium-profile/
+**/chromium-profiles/
+**/user-data-dir/
+**/User Data/
+**/Default/
+**/Profile */
