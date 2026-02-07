@@ -24,7 +24,9 @@ accountsRouter.get("/", async (_req, res) => {
 
     const avatarsRoot = path.join(__dirname, "..", "..", "public", "avatars");
 
-    const response = accounts.map((account) => {
+    const response = accounts
+        .filter((account) => account.id !== "acc_001" && account.username !== "acc_001")
+        .map((account) => {
         const riskLevel =
             account.trustScore >= 70 ? "LOW" : account.trustScore >= 40 ? "MEDIUM" : "HIGH";
 

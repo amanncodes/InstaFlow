@@ -68,9 +68,11 @@ const AccountDetail: React.FC<AccountDetailProps> = ({ accountId, onBack }) => {
   const filteredLogs = useMemo(() => {
     if (!data) return [];
     return data.recentSignals.filter(event => {
+      const desc = (event.description || "").toLowerCase();
+      const type = (event.type || "").toLowerCase();
       const matchesSearch = 
-        event.description.toLowerCase().includes(logSearch.toLowerCase()) || 
-        event.type.toLowerCase().includes(logSearch.toLowerCase());
+        desc.includes(logSearch.toLowerCase()) || 
+        type.includes(logSearch.toLowerCase());
       
       const isError = event.severity === 'CRITICAL';
       const isAutomation = event.type.startsWith('ACTION_');
@@ -96,6 +98,7 @@ const AccountDetail: React.FC<AccountDetailProps> = ({ accountId, onBack }) => {
   const riskDimensions = data.riskDimensions ?? [];
   const activityPulse = data.activityPulse ?? [];
   const performance = data.performance;
+  const displayUsername = data.username || data.accountId;
 
   const formatOptionalNumber = (value?: number) =>
     value === null || value === undefined ? "—" : value.toLocaleString();
@@ -182,7 +185,7 @@ const AccountDetail: React.FC<AccountDetailProps> = ({ accountId, onBack }) => {
                 </div>
               </div>
               <div>
-                <h3 className="text-2xl font-black tracking-tighter">@{data.username}</h3>
+                <h3 className="text-2xl font-black tracking-tighter">@{displayUsername}</h3>
                 <RiskBadge level={data.riskLevel} />
               </div>
               <div className="w-full pt-4 border-t border-zinc-800 space-y-3">

@@ -15,7 +15,7 @@ const safeString = (value: unknown) => {
 
 export const describeEvent = (eventType: string, payload: Payload): string => {
   if (!payload) {
-    return "No additional details were provided for this event.";
+    return `${eventType.replace(/_/g, " ")}. No payload was attached to this event.`;
   }
 
   if (typeof payload === "string") {
@@ -23,7 +23,7 @@ export const describeEvent = (eventType: string, payload: Payload): string => {
   }
 
   if (typeof payload !== "object" || Array.isArray(payload)) {
-    return safeString(payload) || "No additional details were provided for this event.";
+    return safeString(payload) || `${eventType.replace(/_/g, " ")}. No payload was attached to this event.`;
   }
 
   const data = payload as Record<string, unknown>;
@@ -42,18 +42,29 @@ export const describeEvent = (eventType: string, payload: Payload): string => {
     if (v) details.push(`${label}=${v}`);
   };
 
-  pushDetail("platform", data.platform);
-  pushDetail("username", data.username);
-  pushDetail("target", data.target);
-  pushDetail("action", data.action);
-  pushDetail("status", data.status);
-  pushDetail("cookies", data.cookiesCount ?? data.cookies_count);
-  pushDetail("ip", data.ip);
-  pushDetail("proxy", data.proxy);
-  pushDetail("url", data.url);
-  pushDetail("step", data.step);
-  pushDetail("session", data.sessionId ?? data.session_id);
-  pushDetail("rule", data.rule);
+  const knownKeys = new Set<string>();
+  const remember = (key: string) => knownKeys.add(key);
+
+  pushDetail("platform", data.platform); remember("platform");
+  pushDetail("username", data.username); remember("username");
+  pushDetail("target", data.target); remember("target");
+  pushDetail("action", data.action); remember("action");
+  pushDetail("status", data.status); remember("status");
+  pushDetail("cookies", data.cookiesCount ?? data.cookies_count); remember("cookiesCount"); remember("cookies_count");
+  pushDetail("ip", data.ip); remember("ip");
+  pushDetail("proxy", data.proxy); remember("proxy");
+  pushDetail("url", data.url); remember("url");
+  pushDetail("step", data.step); remember("step");
+  pushDetail("session", data.sessionId ?? data.session_id); remember("sessionId"); remember("session_id");
+  pushDetail("rule", data.rule); remember("rule");
+
+  for (const [key, value] of Object.entries(data)) {
+    if (knownKeys.has(key)) continue;
+    if (key === "description" || key === "message" || key === "reason" || key === "error") continue;
+    const v = safeString(value);
+    if (!v) continue;
+    details.push(`${key}=${v}`);
+  }
 
   const base = primary || eventType.replace(/_/g, " ");
   if (details.length === 0) {
