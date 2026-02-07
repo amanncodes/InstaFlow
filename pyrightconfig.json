@@ -1,0 +1,12 @@
+{
+  "include": [
+    "automation-engine/**/*.py",
+    "backend/**/*.ts"
+  ],
+  "extraPaths": [
+    "automation-engine/login-bot",
+    "automation-engine"
+  ],
+  "venvPath": "automation-engine/login-bot",
+  "venv": ".venv"
+}
