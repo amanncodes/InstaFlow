@@ -3,8 +3,28 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "../db";
 import { EventSchema } from "./schema";
 import { applyEventScore } from "../scoring/engine";
+import { describeEvent } from "./describe";
 
 export const eventsRouter = Router();
+
+eventsRouter.get("/", async (_req, res) => {
+  const events = await prisma.accountEvent.findMany({
+    orderBy: { occurredAt: "desc" },
+    take: 200
+  });
+
+  const mapped = events.map((e) => ({
+    id: e.eventId,
+    accountId: e.accountId,
+    type: e.eventType,
+    severity: e.severity === "danger" ? "CRITICAL" : e.severity.toUpperCase(),
+    description: describeEvent(e.eventType, e.payload as Prisma.JsonValue),
+    timestamp: e.occurredAt.toISOString(),
+    metadata: e.payload as Record<string, unknown> | null
+  }));
+
+  res.json(mapped);
+});
 
 eventsRouter.post("/", async (req, res) => {
   const parsed = EventSchema.safeParse(req.body);
